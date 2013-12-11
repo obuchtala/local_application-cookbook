@@ -1,14 +1,13 @@
-
 action :deploy do
   #ensure that the parent directory exists
-  parent_directory = ::File.dirname(@new_resource.path)
+  parent_directory = ::File.dirname(new_resource.path)
   directory parent_directory do
     action :create
     recursive true
   end
 
   link new_resource.path do
-    to new_resource.shared_folder
+    to new_resource.source
   end
 
   propagate :before_compile
@@ -22,7 +21,6 @@ end
 protected
 
 def propagate (action)
-  new_resource.application_provider self
   new_resource.sub_resources.each do |resource|
     resource.application_provider self
     resource.run_action action
@@ -30,7 +28,6 @@ def propagate (action)
 end
 
 def run_restart
-  new_resource.application_provider self
   new_resource.sub_resources.each do |resource|
     resource.application_provider self
     if resource.restart_command
